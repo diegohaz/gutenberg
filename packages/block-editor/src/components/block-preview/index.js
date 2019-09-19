@@ -18,9 +18,9 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-function ScaledBlockPreview( { blocks, viewportWidth, __experimentalOnReady } ) {
-	const previewRef = useRef( null );
-
+function ScaledBlockPreview( { blocks, viewportWidth, __experimentalOnReady, previewRef } ) {
+	const previewRefLocal = useRef( null );
+	previewRef = previewRef ? previewRef : previewRefLocal;
 	const [ isReady, setIsReady ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ { x, y }, setPosition ] = useState( { x: 0, y: 0 } );
@@ -59,7 +59,6 @@ function ScaledBlockPreview( { blocks, viewportWidth, __experimentalOnReady } ) 
 				__experimentalOnReady( {
 					scale,
 					position: { x: offsetX * scale, y: offsetY },
-					ref: previewRef,
 				} );
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
@@ -106,7 +105,7 @@ function ScaledBlockPreview( { blocks, viewportWidth, __experimentalOnReady } ) 
 	);
 }
 
-export function BlockPreview( { blocks, viewportWidth = 700, settings, __experimentalOnReady = noop } ) {
+export function BlockPreview( { blocks, viewportWidth = 700, settings, __experimentalOnReady = noop, __experimentalBlockPreviewRef } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
 	useLayoutEffect( triggerRecompute, [ blocks ] );
@@ -127,6 +126,7 @@ export function BlockPreview( { blocks, viewportWidth = 700, settings, __experim
 				blocks={ renderedBlocks }
 				viewportWidth={ viewportWidth }
 				__experimentalOnReady={ __experimentalOnReady }
+				previewRef={ __experimentalBlockPreviewRef }
 			/>
 		</BlockEditorProvider>
 	);
