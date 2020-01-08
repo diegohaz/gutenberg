@@ -14,8 +14,8 @@ describe( 'Toolbar', () => {
 		it( 'should render a toolbar with toolbar buttons', () => {
 			const { getByLabelText } = render(
 				<Toolbar __experimentalAccessibilityLabel="blocks">
-					<ToolbarButton title="control1" />
-					<ToolbarButton title="control2" />
+					<ToolbarButton label="control1" />
+					<ToolbarButton label="control2" />
 				</Toolbar>
 			);
 
