@@ -31,8 +31,8 @@ describe( 'Toolbar', () => {
 				<>
 					<button>button1</button>
 					<Toolbar __experimentalAccessibilityLabel="blocks">
-						<ToolbarButton title="control1" />
-						<ToolbarButton title="control2" />
+						<ToolbarButton label="control1" />
+						<ToolbarButton label="control2" />
 					</Toolbar>
 					<button>button2</button>
 				</>
@@ -54,9 +54,9 @@ describe( 'Toolbar', () => {
 		it( 'moves focus between toolbar buttons with arrow keys', () => {
 			const { getByLabelText } = render(
 				<Toolbar __experimentalAccessibilityLabel="blocks">
-					<ToolbarButton title="control1" />
-					<ToolbarButton title="control2" />
-					<ToolbarButton title="control3" />
+					<ToolbarButton label="control1" />
+					<ToolbarButton label="control2" />
+					<ToolbarButton label="control3" />
 				</Toolbar>
 			);
 
@@ -89,23 +89,6 @@ describe( 'Toolbar', () => {
 		it( 'should render an empty node, when controls are empty', () => {
 			const { container } = render( <Toolbar controls={ [] } /> );
 			expect( container ).toBeEmpty();
-		} );
-
-		it( 'should render a list of controls with buttons', () => {
-			const clickHandler = ( event ) => event;
-			const controls = [
-				{
-					icon: 'wordpress',
-					title: 'WordPress',
-					subscript: 'wp',
-					onClick: clickHandler,
-					isActive: false,
-				},
-			];
-			const { getByLabelText } = render( <Toolbar controls={ controls } /> );
-			const button = getByLabelText( 'WordPress' );
-
-			expect( button ).toMatchSnapshot();
 		} );
 	} );
 } );
