@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { mount } from 'enzyme';
+import { render, press } from '@wordpress/test-utils';
 
 /**
  * Internal dependencies
@@ -12,49 +12,83 @@ import ToolbarButton from '../../toolbar-button';
 describe( 'Toolbar', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a toolbar with toolbar buttons', () => {
-			const wrapper = mount(
+			const { getByLabelText } = render(
 				<Toolbar __experimentalAccessibilityLabel="blocks">
 					<ToolbarButton label="control1" />
 					<ToolbarButton label="control2" />
 				</Toolbar>
 			);
-			const control1 = wrapper.find( 'button[aria-label="control1"]' );
-			const control2 = wrapper.find( 'button[aria-label="control1"]' );
-			expect( control1 ).toHaveLength( 1 );
-			expect( control2 ).toHaveLength( 1 );
+
+			const control1 = getByLabelText( 'control1' );
+			const control2 = getByLabelText( 'control2' );
+
+			expect( control1 ).toBeInTheDocument();
+			expect( control2 ).toBeInTheDocument();
+		} );
+
+		it( 'does not move focus between toolbar buttons with tab key', () => {
+			const { getByLabelText, getByText } = render(
+				<>
+					<button>button1</button>
+					<Toolbar __experimentalAccessibilityLabel="blocks">
+						<ToolbarButton label="control1" />
+						<ToolbarButton label="control2" />
+					</Toolbar>
+					<button>button2</button>
+				</>
+			);
+
+			const button1 = getByText( 'button1' );
+			const control1 = getByLabelText( 'control1' );
+			const button2 = getByText( 'button2' );
+
+			expect( button1 ).not.toHaveFocus();
+			press.Tab();
+			expect( button1 ).toHaveFocus();
+			press.Tab();
+			expect( control1 ).toHaveFocus();
+			press.Tab();
+			expect( button2 ).toHaveFocus();
+		} );
+
+		it( 'moves focus between toolbar buttons with arrow keys', () => {
+			const { getByLabelText } = render(
+				<Toolbar __experimentalAccessibilityLabel="blocks">
+					<ToolbarButton label="control1" />
+					<ToolbarButton label="control2" />
+					<ToolbarButton label="control3" />
+				</Toolbar>
+			);
+
+			const control1 = getByLabelText( 'control1' );
+			const control2 = getByLabelText( 'control2' );
+			const control3 = getByLabelText( 'control3' );
+
+			expect( control1 ).not.toHaveFocus();
+			press.Tab();
+			expect( control1 ).toHaveFocus();
+			press.Tab();
+			expect( control1 ).toHaveFocus();
+			press.ArrowRight();
+			expect( control2 ).toHaveFocus();
+			press.ArrowRight();
+			expect( control3 ).toHaveFocus();
+			press.ArrowRight();
+			expect( control1 ).toHaveFocus();
+			press.ArrowLeft();
+			expect( control3 ).toHaveFocus();
 		} );
 	} );
 
 	describe( 'ToolbarGroup', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
-			const wrapper = mount( <Toolbar /> );
-			expect( wrapper.html() ).toBeNull();
+			const { container } = render( <Toolbar /> );
+			expect( container ).toBeEmpty();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
-			const wrapper = mount( <Toolbar controls={ [] } /> );
-			expect( wrapper.html() ).toBeNull();
-		} );
-
-		it( 'should render a list of controls with buttons', () => {
-			const clickHandler = ( event ) => event;
-			const controls = [
-				{
-					icon: 'wordpress',
-					title: 'WordPress',
-					subscript: 'wp',
-					onClick: clickHandler,
-					isActive: false,
-				},
-			];
-			const wrapper = mount( <Toolbar controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
-			expect( button.props() ).toMatchObject( {
-				'aria-label': 'WordPress',
-				'aria-pressed': false,
-				'data-subscript': 'wp',
-				type: 'button',
-			} );
+			const { container } = render( <Toolbar controls={ [] } /> );
+			expect( container ).toBeEmpty();
 		} );
 	} );
 } );
